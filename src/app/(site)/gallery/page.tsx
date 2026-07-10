@@ -1,45 +1,50 @@
 import Image from "next/image";
+import { createClient } from "@/lib/supabase/server";
 
-const photos = [
-  {
-    id: 1,
-    src: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&q=80",
-    alt: "Couple walking hand in hand",
-  },
-  {
-    id: 2,
-    src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=600&q=80",
-    alt: "Couple silhouette at sunset",
-  },
-  {
-    id: 3,
-    src: "https://images.unsplash.com/photo-1518199267971-48cc2b8c0f6c?w=600&q=80",
-    alt: "Romantic couple embrace",
-  },
-  {
-    id: 4,
-    src: "https://images.unsplash.com/photo-1530109242549-1e42b3e5f6b8?w=600&q=80",
-    alt: "Pair of wedding rings",
-  },
-];
+export default async function GalleryPage() {
+  const supabase = await createClient();
 
-export default function GalleryPage() {
+  const { data: photos } = await supabase
+    .from("photos")
+    .select("src, alt")
+    .order("created_at", { ascending: false });
+
   return (
     <div className="flex-1 bg-linear-to-b from-rose-50 to-white">
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-        <h1 className="mb-8 text-3xl font-bold tracking-tight">Gallery</h1>
+        <h1 className="mb-8 text-3xl font-bold tracking-tight">相册</h1>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {photos.map((photo) => (
-            <div key={photo.id} className="relative aspect-square overflow-hidden rounded-xl">
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                fill
-                sizes="(max-width: 768px) 50vw, 25vw"
-                className="object-cover transition-transform duration-300 hover:scale-105"
-              />
-            </div>
-          ))}
+          {photos && photos.length > 0 ? (
+            photos.map((photo, i) => (
+              <div key={i} className="group aspect-square overflow-hidden rounded-xl">
+                <a
+                  href={photo.src}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative block h-full"
+                >
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {photo.alt && (
+                    <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
+                      <p className="wrap-break-word text-xs leading-relaxed text-white">
+                        {photo.alt}
+                      </p>
+                    </div>
+                  )}
+                </a>
+              </div>
+            ))
+          ) : (
+            <p className="col-span-full text-center text-muted-foreground">
+              暂无照片
+            </p>
+          )}
         </div>
       </section>
     </div>
