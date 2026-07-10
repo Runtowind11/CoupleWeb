@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useActionState, Suspense, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,17 @@ import { Heart, AlertCircle, ShieldAlert } from "lucide-react";
 import { login } from "./actions";
 
 function LoginForm() {
-  const [state, formAction, pending] = useActionState(login, { error: "" });
+  const [state, formAction, pending] = useActionState(login, { error: "", success: false });
   const searchParams = useSearchParams();
+  const router = useRouter();
   const isUnauthorized = searchParams.get("message") === "unauthorized";
+
+  useEffect(() => {
+    if (state.success) {
+      sessionStorage.setItem("admin_session", "true");
+      router.push("/dashboard");
+    }
+  }, [state.success, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-rose-100 to-purple-100 px-4">

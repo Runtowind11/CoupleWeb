@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { logout } from "@/app/(admin)/actions";
 
+function handleLogout() {
+  sessionStorage.removeItem("admin_session");
+}
+
 const navItems = [
   { href: "/dashboard", label: "控制台", icon: LayoutDashboard },
   { href: "/dashboard/blog", label: "博客", icon: Newspaper },
@@ -55,7 +59,7 @@ export default function Sidebar() {
             回到主页
           </Button>
         </Link>
-        <form action={logout}>
+        <form action={logout} onSubmit={handleLogout}>
           <Button
             type="submit"
             variant="ghost"
