@@ -1,3 +1,6 @@
+import SiteHeader from "@/components/site/SiteHeader";
+import SiteFooter from "@/components/site/SiteFooter";
+
 export default function SiteLayout({
   children,
 }: {
@@ -5,13 +8,9 @@ export default function SiteLayout({
 }) {
   return (
     <>
-      <header className="h-16 border-b flex items-center px-6">
-        <span className="font-semibold">Header Placeholder</span>
-      </header>
+      <SiteHeader />
       <main className="flex-1">{children}</main>
-      <footer className="h-16 border-t flex items-center justify-center px-6">
-        <span className="text-sm text-muted-foreground">Footer Placeholder</span>
-      </footer>
+      <SiteFooter />
     </>
   );
 }
