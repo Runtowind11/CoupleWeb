@@ -1,3 +1,5 @@
+import Sidebar from "@/components/admin/Sidebar";
+
 export default function AdminLayout({
   children,
 }: {
@@ -5,10 +7,8 @@ export default function AdminLayout({
 }) {
   return (
     <div className="flex h-screen">
-      <aside className="w-64 border-r flex flex-col p-4">
-        <span className="font-semibold mb-6">Admin Sidebar Placeholder</span>
-      </aside>
-      <main className="flex-1 p-6">{children}</main>
+      <Sidebar />
+      <main className="flex-1 overflow-auto bg-zinc-50 p-8">{children}</main>
     </div>
   );
 }
