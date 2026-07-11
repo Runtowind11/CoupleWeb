@@ -1,1 +1,1 @@
-export const ANNIVERSARY_DATE = "2020-01-15";
+export const ANNIVERSARY_DATE = "2022-11-19";

@@ -1,5 +1,6 @@
 import { Heart } from "lucide-react";
 import LoveCounter from "./LoveCounter";
+import { ANNIVERSARY_DATE } from "@/lib/constants";
 
 export default function HeroSection() {
   return (
@@ -10,9 +11,9 @@ export default function HeroSection() {
           Our Story
         </h1>
         <p className="text-lg text-muted-foreground md:text-xl">
-          始于 2020.01.15
+          始于 {ANNIVERSARY_DATE.replace(/-/g, ".")}
         </p>
-        <LoveCounter anniversary="2020-01-15" />
+        <LoveCounter anniversary={ANNIVERSARY_DATE} />
       </div>
     </section>
   );
