@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Newspaper, Images, LogOut, House, Menu, X } from "lucide-react";
+import { LayoutDashboard, Newspaper, Images, LogOut, House, Menu, X, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { logout } from "@/app/(admin)/actions";
@@ -16,6 +16,7 @@ const navItems = [
   { href: "/dashboard", label: "控制台", icon: LayoutDashboard },
   { href: "/dashboard/blog", label: "博客", icon: Newspaper },
   { href: "/dashboard/gallery", label: "相册", icon: Images },
+  { href: "/dashboard/approvals", label: "审核", icon: ShieldCheck },
 ];
 
 export default function Sidebar() {

@@ -13,6 +13,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const isUnauthorized = searchParams.get("message") === "unauthorized";
+  const isApproved = searchParams.get("approved") === "true";
 
   useEffect(() => {
     if (state.success) {
@@ -20,6 +21,13 @@ function LoginForm() {
       router.push("/dashboard");
     }
   }, [state.success, router]);
+
+  useEffect(() => {
+    if (state.pending) {
+      sessionStorage.setItem("pending_email", state.email);
+      router.push("/login/pending");
+    }
+  }, [state.pending, state.email, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-rose-100 to-purple-100 px-4">
@@ -33,6 +41,12 @@ function LoginForm() {
             <div className="mb-4 flex items-center gap-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-700">
               <ShieldAlert className="h-4 w-4 shrink-0" />
               请管理员登录后进行访问
+            </div>
+          )}
+          {isApproved && (
+            <div className="mb-4 flex items-center gap-2 rounded-lg bg-green-50 p-3 text-sm text-green-700">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              审核已通过，请重新登录
             </div>
           )}
           <form className="space-y-4" action={formAction}>
