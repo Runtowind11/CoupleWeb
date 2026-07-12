@@ -36,7 +36,7 @@ export default async function ApprovalsPage() {
               </CardHeader>
               <CardContent>
                 <p className="mb-4 text-sm text-muted-foreground">
-                  请求时间：{new Date(item.created_at).toLocaleString("zh-CN")}
+                  请求时间：{new Date(item.created_at).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
                 </p>
                 <div className="flex gap-3">
                   <form action={approve.bind(null, item.id)}>
