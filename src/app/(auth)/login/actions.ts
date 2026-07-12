@@ -50,6 +50,7 @@ export async function login(
     return { error: "", pending: true, email };
   }
 
+  await supabase.auth.signOut({ scope: "others" });
   revalidatePath("/dashboard", "layout");
   return { error: "", success: true };
 }
