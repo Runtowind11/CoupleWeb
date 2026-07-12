@@ -1,11 +1,19 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, X, ShieldAlert } from "lucide-react";
 import { approve, deny } from "./actions";
 
+const APPROVER_EMAIL = "3275239616@qq.com";
+
 export default async function ApprovalsPage() {
   const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user?.email !== APPROVER_EMAIL) {
+    redirect("/dashboard");
+  }
 
   const { data: pendingList } = await supabase
     .from("pending_approvals")
