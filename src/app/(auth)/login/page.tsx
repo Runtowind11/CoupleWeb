@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Heart, AlertCircle, ShieldAlert } from "lucide-react";
+import { Heart, AlertCircle, ShieldAlert, ChevronLeft } from "lucide-react";
 import { login } from "./actions";
 
 function LoginForm() {
@@ -68,6 +68,12 @@ function LoginForm() {
               {pending ? "登录中..." : "登录"}
             </Button>
           </form>
+          <div className="mt-4 text-center">
+            <a href="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-rose-500">
+              <ChevronLeft className="h-4 w-4" />
+              回到主页
+            </a>
+          </div>
         </CardContent>
       </Card>
     </div>
