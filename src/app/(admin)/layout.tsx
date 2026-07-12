@@ -8,9 +8,9 @@ export default function AdminLayout({
 }) {
   return (
     <SessionGuard>
-      <div className="flex h-screen">
+      <div className="flex min-h-screen md:h-screen">
         <Sidebar />
-        <main className="flex-1 overflow-auto bg-zinc-50 p-8">{children}</main>
+        <main className="flex-1 overflow-auto bg-zinc-50 p-4 pt-16 md:p-8 md:pt-8">{children}</main>
       </div>
     </SessionGuard>
   );
