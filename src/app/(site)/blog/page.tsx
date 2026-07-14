@@ -7,7 +7,7 @@ export default async function BlogPage() {
 
   const { data: posts } = await supabase
     .from("posts")
-    .select("slug, title, excerpt, created_at")
+    .select("slug, title, created_at")
     .eq("published", true)
     .order("created_at", { ascending: false });
 
@@ -33,7 +33,6 @@ export default async function BlogPage() {
                     {new Date(post.created_at).toLocaleDateString("zh-CN")}
                   </time>
                 </div>
-                <p className="mt-3 text-muted-foreground">{post.excerpt}</p>
               </article>
             ))
           ) : (
