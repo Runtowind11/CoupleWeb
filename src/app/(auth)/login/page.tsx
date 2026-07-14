@@ -18,7 +18,7 @@ function LoginForm() {
   useEffect(() => {
     if (state.success) {
       sessionStorage.setItem("admin_session", "true");
-      router.push("/dashboard");
+      router.push("/");
     }
   }, [state.success, router]);
 

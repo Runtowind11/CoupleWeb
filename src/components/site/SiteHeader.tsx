@@ -29,7 +29,7 @@ export default function SiteHeader() {
             相册
           </Link>
           <Link
-            href="/login"
+            href="/dashboard"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             管理
