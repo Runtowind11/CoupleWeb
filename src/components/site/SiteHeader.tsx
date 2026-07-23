@@ -34,6 +34,14 @@ export default function SiteHeader() {
           >
             管理
           </Link>
+          <a
+            href="https://node.taild96dec.ts.net/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            观影
+          </a>
         </nav>
       </div>
     </header>

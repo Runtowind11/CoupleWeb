@@ -20,10 +20,6 @@ export async function login(
     .gte("created_at", new Date(Date.now() - 5 * 60 * 1000).toISOString())
     .maybeSingle();
 
-  if (recentApproval) {
-    await supabase.from("pending_approvals").delete().eq("id", recentApproval.id);
-  }
-
   const { error: authError } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -50,8 +46,11 @@ export async function login(
     return { error: "", pending: true, email };
   }
 
+  if (recentApproval) {
+    await supabase.from("pending_approvals").delete().eq("id", recentApproval.id);
+  }
+
   await supabase.auth.signOut({ scope: "others" });
-  revalidatePath("/dashboard", "layout");
   return { error: "", success: true };
 }
 
