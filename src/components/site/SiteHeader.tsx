@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Heart, Clapperboard } from "lucide-react";
+import { Heart } from "lucide-react";
 
 export default function SiteHeader() {
   return (
@@ -40,7 +40,6 @@ export default function SiteHeader() {
             rel="noopener noreferrer"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            <Clapperboard className="mr-1 h-4 w-4" />
             观影
           </a>
         </nav>
