@@ -14,12 +14,14 @@ export function createClient() {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            const { maxAge: _, ...rest } = options ?? {};
+            const { maxAge, ...rest } = options ?? {};
+            const isRemove = !value || maxAge === 0;
             let cookie = `${name}=${value}`;
             if (rest.path) cookie += `; path=${rest.path}`;
             if (rest.domain) cookie += `; domain=${rest.domain}`;
             if (rest.sameSite) cookie += `; samesite=${String(rest.sameSite).toLowerCase()}`;
             if (rest.secure) cookie += "; secure";
+            if (isRemove) cookie += `; max-age=0`;
             document.cookie = cookie;
           });
         },
