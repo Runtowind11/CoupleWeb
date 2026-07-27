@@ -1,21 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Newspaper, Images, LogOut, House, Menu, X, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Newspaper, Images, LogOut, House, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import { logout } from "@/app/(admin)/actions";
 
 function handleLogout() {
   sessionStorage.removeItem("admin_session");
 }
 
-const APPROVER_EMAIL = "3275239616@qq.com";
-
-const baseNavItems = [
+const navItems = [
   { href: "/dashboard", label: "控制台", icon: LayoutDashboard },
   { href: "/dashboard/blog", label: "博客", icon: Newspaper },
   { href: "/dashboard/gallery", label: "相册", icon: Images },
@@ -24,20 +21,6 @@ const baseNavItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const [isApprover, setIsApprover] = useState(false);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      if (data?.user?.email === APPROVER_EMAIL) {
-        setIsApprover(true);
-      }
-    });
-  }, []);
-
-  const navItems = isApprover
-    ? [...baseNavItems, { href: "/dashboard/approvals", label: "审核", icon: ShieldCheck }]
-    : baseNavItems;
 
   function close() {
     setIsOpen(false);
