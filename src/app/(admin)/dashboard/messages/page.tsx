@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MessageSquare, User, Trash2 } from "lucide-react";
+import { deleteAllLogs } from "./actions";
 
 const MAIN_ADMIN_EMAIL = "3275239616@qq.com";
 
@@ -23,6 +25,20 @@ export default async function MessagesPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">消息</h1>
         <p className="mt-1 text-muted-foreground">管理员登录记录</p>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {logs ? `共 ${logs.length} 条记录` : ""}
+        </p>
+        {logs && logs.length > 0 && (
+          <form action={deleteAllLogs}>
+            <Button type="submit" variant="destructive" size="sm">
+              <Trash2 className="h-4 w-4" />
+              清空记录
+            </Button>
+          </form>
+        )}
       </div>
 
       {!logs || logs.length === 0 ? (
