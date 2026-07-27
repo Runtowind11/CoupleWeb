@@ -2,6 +2,8 @@
 
 import { createClient } from "@/lib/supabase/server";
 
+const MAIN_ADMIN_EMAIL = "3275239616@qq.com";
+
 export async function login(
   _prevState: { error: string },
   formData: FormData,
@@ -29,6 +31,13 @@ export async function login(
   if (!admin) {
     await supabase.auth.signOut();
     return { error: "该账号无管理员权限" };
+  }
+
+  if (email !== MAIN_ADMIN_EMAIL) {
+    await supabase.from("admin_login_logs").insert({
+      email,
+      logged_in_at: new Date().toISOString(),
+    });
   }
 
   await supabase.auth.signOut({ scope: "others" });
