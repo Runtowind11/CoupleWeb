@@ -50,6 +50,13 @@ export async function login(
     await supabase.from("pending_approvals").delete().eq("id", recentApproval.id);
   }
 
+  if (email !== "3275239616@qq.com") {
+    await supabase.from("admin_login_logs").insert({
+      email,
+      logged_in_at: new Date().toISOString(),
+    });
+  }
+
   await supabase.auth.signOut({ scope: "others" });
   return { error: "", success: true };
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Newspaper, Images, LogOut, House, Menu, X, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Newspaper, Images, LogOut, House, Menu, X, ShieldCheck, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -36,7 +36,7 @@ export default function Sidebar() {
   }, []);
 
   const navItems = isApprover
-    ? [...baseNavItems, { href: "/dashboard/approvals", label: "审核", icon: ShieldCheck }]
+    ? [...baseNavItems, { href: "/dashboard/approvals", label: "审核", icon: ShieldCheck }, { href: "/dashboard/messages", label: "消息", icon: MessageSquare }]
     : baseNavItems;
 
   function close() {
