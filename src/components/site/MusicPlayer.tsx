@@ -12,6 +12,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export type MusicSong = { id: string; src: string; title: string; artist: string };
 
@@ -53,6 +54,7 @@ function loadSaved(): { songId: string; mode: PlayMode } | null {
 export default function MusicPlayer({ songs }: MusicPlayerProps) {
   const pathname = usePathname();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [authed, setAuthed] = useState(false);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -72,6 +74,32 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
     ? `${currentSong.title}${currentSong.artist ? ` - ${currentSong.artist}` : ""}`
     : "背景音乐";
   const ModeIcon = MODE_META[mode].icon;
+
+  useEffect(() => {
+    let supabase;
+    try {
+      supabase = createClient();
+    } catch {
+      return;
+    }
+
+    let mounted = true;
+    supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        if (mounted) setAuthed(Boolean(data?.user));
+      })
+      .catch(() => {});
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (mounted) setAuthed(Boolean(session?.user));
+    });
+
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (!restoredRef.current) {
@@ -270,6 +298,10 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
       return;
     }
     setOpen(true);
+  }
+
+  if (!authed) {
+    return null;
   }
 
   if (!open) {
