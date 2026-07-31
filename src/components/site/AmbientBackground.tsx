@@ -5,16 +5,22 @@ import { useEffect, useRef } from "react";
 const WELCOME_TEXT = "执子之手，与子偕老";
 
 const PETALS = [
-  { left: "4%", size: 14, delay: 0, duration: 19, opacity: 0.24, drift: "7vw" },
-  { left: "14%", size: 10, delay: 4, duration: 22, opacity: 0.18, drift: "-5vw" },
-  { left: "23%", size: 12, delay: 9, duration: 17, opacity: 0.22, drift: "9vw" },
-  { left: "33%", size: 9, delay: 2, duration: 24, opacity: 0.16, drift: "-6vw" },
-  { left: "42%", size: 13, delay: 12, duration: 20, opacity: 0.2, drift: "5vw" },
-  { left: "52%", size: 10, delay: 6, duration: 18, opacity: 0.22, drift: "-8vw" },
-  { left: "61%", size: 15, delay: 15, duration: 23, opacity: 0.18, drift: "6vw" },
-  { left: "71%", size: 11, delay: 1, duration: 21, opacity: 0.24, drift: "-4vw" },
-  { left: "82%", size: 9, delay: 8, duration: 16, opacity: 0.18, drift: "8vw" },
-  { left: "92%", size: 13, delay: 11, duration: 25, opacity: 0.2, drift: "-7vw" },
+  { left: "3%", size: 14, delay: 0, duration: 19, opacity: 0.38, drift: "7vw" },
+  { left: "9%", size: 10, delay: 5, duration: 22, opacity: 0.3, drift: "-5vw" },
+  { left: "16%", size: 12, delay: 9, duration: 17, opacity: 0.35, drift: "9vw" },
+  { left: "22%", size: 9, delay: 2, duration: 24, opacity: 0.28, drift: "-6vw" },
+  { left: "28%", size: 13, delay: 12, duration: 20, opacity: 0.33, drift: "5vw" },
+  { left: "35%", size: 10, delay: 6, duration: 18, opacity: 0.36, drift: "-8vw" },
+  { left: "41%", size: 15, delay: 15, duration: 23, opacity: 0.3, drift: "6vw" },
+  { left: "48%", size: 11, delay: 1, duration: 21, opacity: 0.38, drift: "-4vw" },
+  { left: "54%", size: 9, delay: 8, duration: 16, opacity: 0.3, drift: "8vw" },
+  { left: "60%", size: 13, delay: 11, duration: 25, opacity: 0.33, drift: "-7vw" },
+  { left: "66%", size: 12, delay: 3, duration: 20, opacity: 0.35, drift: "6vw" },
+  { left: "72%", size: 10, delay: 14, duration: 22, opacity: 0.3, drift: "-5vw" },
+  { left: "78%", size: 14, delay: 7, duration: 18, opacity: 0.36, drift: "7vw" },
+  { left: "84%", size: 11, delay: 16, duration: 24, opacity: 0.32, drift: "-6vw" },
+  { left: "90%", size: 9, delay: 4, duration: 17, opacity: 0.3, drift: "8vw" },
+  { left: "96%", size: 13, delay: 10, duration: 21, opacity: 0.34, drift: "-4vw" },
 ];
 
 const STARS = [
@@ -81,7 +87,7 @@ export default function AmbientBackground() {
               width: p.size,
               height: p.size * 1.35,
               background:
-                "linear-gradient(135deg, rgb(244 114 182 / 0.55), rgb(251 207 232 / 0.4))",
+                "linear-gradient(135deg, rgb(236 72 153 / 0.75), rgb(251 113 133 / 0.55))",
               animation: `petal-fall ${p.duration}s linear ${p.delay}s infinite`,
               "--petal-drift": p.drift,
               "--petal-opacity": p.opacity,
