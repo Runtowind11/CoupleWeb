@@ -86,12 +86,15 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
     }
 
     let mounted = true;
-    supabase.auth
-      .getUser()
-      .then(({ data }) => {
-        if (mounted) setAuthed(Boolean(data?.user));
-      })
-      .catch(() => {});
+    const check = () =>
+      supabase.auth
+        .getUser()
+        .then(({ data }) => {
+          if (mounted) setAuthed(Boolean(data?.user));
+        })
+        .catch(() => {});
+
+    check();
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (mounted) setAuthed(Boolean(session?.user));
@@ -101,7 +104,7 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
       mounted = false;
       sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (!restoredRef.current) {
@@ -150,7 +153,7 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
       audio.currentTime = 0;
       audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
     }
-  }, [currentId, audioSrc, resyncTick]);
+  }, [currentId, audioSrc, resyncTick, authed]);
 
   useEffect(() => {
     const audio = audioRef.current;
