@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Music, Pause, Play, X } from "lucide-react";
 
 function formatTime(t: number) {
@@ -16,6 +16,7 @@ export default function MusicPlayer() {
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const winRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef({
     startX: 0,
     startY: 0,
@@ -42,6 +43,18 @@ export default function MusicPlayer() {
       audio.removeEventListener("ended", onEnded);
     };
   }, []);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    const el = winRef.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const x = Math.min(Math.max(rect.left, 12), window.innerWidth - rect.width - 12);
+    const y = Math.min(Math.max(rect.top, 12), window.innerHeight - rect.height - 12);
+    if (x !== rect.left) el.style.left = `${x}px`;
+    if (y !== rect.top) el.style.top = `${y}px`;
+  }, [open]);
 
   function toggle() {
     const audio = audioRef.current;
@@ -141,7 +154,11 @@ export default function MusicPlayer() {
   }
 
   return (
-    <div className="fixed right-4 bottom-4 z-50 sm:right-6 sm:bottom-6">
+    <div
+      ref={winRef}
+      className="fixed z-50"
+      style={pos ? { left: pos.x, top: pos.y } : { right: 16, bottom: 16 }}
+    >
       <div className="liquid-glass w-72 rounded-2xl p-4">
         <div className="flex items-center gap-2">
           <Music className="h-4 w-4 shrink-0 text-rose-500" />
