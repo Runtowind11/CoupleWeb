@@ -107,7 +107,12 @@ export default function AmbientBackground() {
       ))}
 
       <div className="absolute inset-x-0 bottom-0 flex justify-center pb-[14vh]">
-        <p className="font-handwriting text-rose-500/8 text-[clamp(2.25rem,10vw,5rem)] leading-none whitespace-nowrap select-none">
+        <p
+          className="font-handwriting text-rose-500/8 leading-none whitespace-nowrap select-none"
+          style={{
+            fontSize: `clamp(1.25rem, calc(100vw / ${WELCOME_TEXT.length} * 0.92), 5rem)`,
+          }}
+        >
           {WELCOME_TEXT}
         </p>
       </div>
