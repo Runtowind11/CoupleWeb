@@ -4,6 +4,7 @@ import "./globals.css";
 import SessionValidator from "@/components/SessionValidator";
 import AmbientBackground from "@/components/site/AmbientBackground";
 import MusicPlayer from "@/components/site/MusicPlayer";
+import { createClient } from "@/lib/supabase/server";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -15,18 +16,35 @@ export const metadata: Metadata = {
   description: "A love story website",
 };
 
-export default function RootLayout({
+async function getActiveSong() {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("songs")
+      .select("src, title, artist")
+      .eq("is_active", true)
+      .limit(1)
+      .maybeSingle();
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const activeSong = await getActiveSong();
+
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <SessionValidator />
         <AmbientBackground />
         {children}
-        <MusicPlayer />
+        <MusicPlayer song={activeSong} />
       </body>
     </html>
   );
