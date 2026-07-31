@@ -4,8 +4,8 @@ import { ANNIVERSARY_DATE } from "@/lib/constants";
 
 export default function HeroSection() {
   return (
-    <section className="flex min-h-[60vh] flex-col items-center justify-center bg-linear-to-b from-rose-100 via-purple-50 to-white px-4 md:min-h-[70vh]">
-      <div className="max-w-3xl space-y-6 text-center">
+    <section className="relative flex min-h-[60vh] flex-col items-center justify-center px-4 md:min-h-[70vh]">
+      <div className="liquid-glass max-w-3xl space-y-6 rounded-3xl px-8 py-12 text-center md:px-12 md:py-14">
         <Heart className="mx-auto h-12 w-12 animate-heart-pulse text-rose-500" />
         <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
           Our Story

@@ -10,7 +10,7 @@ export default async function GalleryPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="flex-1 bg-linear-to-b from-rose-50 to-white">
+    <div className="flex-1">
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         <h1 className="mb-8 text-3xl font-bold tracking-tight">相册</h1>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">

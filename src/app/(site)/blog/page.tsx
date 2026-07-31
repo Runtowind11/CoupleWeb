@@ -12,7 +12,7 @@ export default async function BlogPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="flex-1 bg-linear-to-b from-rose-50 to-white">
+    <div className="flex-1">
       <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         <h1 className="mb-8 text-3xl font-bold tracking-tight">博客</h1>
         <div className="space-y-6">
@@ -20,7 +20,7 @@ export default async function BlogPage() {
             posts.map((post) => (
               <article
                 key={post.slug}
-                className="group rounded-xl border bg-card p-6 transition-shadow hover:shadow-md"
+                className="liquid-glass group rounded-2xl p-6 transition hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <Link href={`/blog/${post.slug}`}>
                   <h2 className="text-xl font-semibold group-hover:text-rose-500">
