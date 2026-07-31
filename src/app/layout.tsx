@@ -4,6 +4,7 @@ import "./globals.css";
 import SessionValidator from "@/components/SessionValidator";
 import AmbientBackground from "@/components/site/AmbientBackground";
 import MusicPlayer, { type MusicSong } from "@/components/site/MusicPlayer";
+import SkyToneSync from "@/components/site/SkyToneSync";
 import { ThemeProvider } from "@/components/theme-provider";
 import { createClient } from "@/lib/supabase/server";
 
@@ -52,6 +53,7 @@ export default async function RootLayout({
         >
           <SessionValidator />
           <AmbientBackground />
+          <SkyToneSync />
           {children}
           <MusicPlayer songs={songs} />
         </ThemeProvider>
