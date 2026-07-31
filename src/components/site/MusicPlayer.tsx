@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   Music,
@@ -70,6 +70,22 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
   const autoAttemptedRef = useRef(false);
   const restoredRef = useRef(false);
   const playingRef = useRef(false);
+  const pendingResumeRef = useRef(false);
+
+  const attemptPlay = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio
+      .play()
+      .then(() => {
+        pendingResumeRef.current = false;
+        setPlaying(true);
+      })
+      .catch(() => {
+        pendingResumeRef.current = true;
+        setPlaying(false);
+      });
+  }, []);
 
   useEffect(() => {
     playingRef.current = playing;
@@ -83,13 +99,13 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
       if (document.hidden) {
         if (!audio.paused) audio.pause();
       } else if (playingRef.current && audio.paused) {
-        audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+        attemptPlay();
       }
     };
 
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
-  }, []);
+  }, [attemptPlay]);
 
   const currentSong = songs.find((s) => s.id === currentId) ?? null;
   const audioSrc = currentSong?.src ?? "/audio/bgm.mp3";
@@ -173,10 +189,23 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
       pendingPlayRef.current = false;
       audio.currentTime = 0;
       if (!document.hidden) {
-        audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+        attemptPlay();
       }
     }
-  }, [currentId, audioSrc, resyncTick, authed]);
+  }, [currentId, audioSrc, resyncTick, authed, attemptPlay]);
+
+  useEffect(() => {
+    const onTap = (e: PointerEvent) => {
+      if (!pendingResumeRef.current) return;
+      if (document.hidden) return;
+      if ((e.target as Element | null)?.closest("[data-player-root]")) return;
+      const audio = audioRef.current;
+      if (!audio || !audio.paused) return;
+      attemptPlay();
+    };
+    document.addEventListener("pointerdown", onTap);
+    return () => document.removeEventListener("pointerdown", onTap);
+  }, [attemptPlay]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -187,7 +216,7 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
     const onEnded = () => {
       if (mode === "single" || songs.length === 0) {
         audio.currentTime = 0;
-        audio.play().catch(() => {});
+        attemptPlay();
         return;
       }
 
@@ -212,7 +241,7 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
       audio.removeEventListener("loadedmetadata", onLoaded);
       audio.removeEventListener("ended", onEnded);
     };
-  }, [mode, songs, currentId]);
+  }, [mode, songs, currentId, attemptPlay]);
 
   useEffect(() => {
     if (pos || pathname !== "/") return;
@@ -247,7 +276,7 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
       audio.pause();
       setPlaying(false);
     } else {
-      audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      attemptPlay();
     }
   }
 
@@ -348,6 +377,7 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
   if (!open) {
     return (
       <div
+        data-player-root=""
         className="fixed z-50"
         style={pos ? { left: pos.x, top: pos.y } : { right: 24, bottom: 24 }}
       >
@@ -379,6 +409,7 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
   return (
     <div
       ref={winRef}
+      data-player-root=""
       onPointerDown={onWinPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
