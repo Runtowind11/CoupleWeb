@@ -41,9 +41,13 @@ export default function Lightbox({ src, alt }: LightboxProps) {
     setIsDragging(false);
   }
 
-  function handleDoubleClick() {
-    setScale(1);
-    setPosition({ x: 0, y: 0 });
+  function handleDoubleClick(e: MouseEvent<HTMLDivElement>) {
+    if ((e.target as Element).closest("img")) {
+      setScale(1);
+      setPosition({ x: 0, y: 0 });
+      return;
+    }
+    setOpen(false);
   }
 
   function handleOpenChange(open: boolean) {
@@ -62,7 +66,7 @@ export default function Lightbox({ src, alt }: LightboxProps) {
       <DialogContent showCloseButton={false} className="flex h-screen w-screen max-w-none items-center justify-center border-0 bg-transparent p-0 shadow-none ring-0">
         <div
           ref={containerRef}
-          className="flex h-full w-full items-center justify-center"
+          className="flex h-full w-full items-center justify-center touch-manipulation"
           onWheel={handleWheel}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
