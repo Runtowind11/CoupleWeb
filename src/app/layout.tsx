@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import SessionValidator from "@/components/SessionValidator";
 import AmbientBackground from "@/components/site/AmbientBackground";
-import MusicPlayer from "@/components/site/MusicPlayer";
+import MusicPlayer, { type MusicSong } from "@/components/site/MusicPlayer";
 import { createClient } from "@/lib/supabase/server";
 
 const inter = Inter({
@@ -16,18 +16,16 @@ export const metadata: Metadata = {
   description: "A love story website",
 };
 
-async function getActiveSong() {
+async function getSongs(): Promise<MusicSong[]> {
   try {
     const supabase = await createClient();
     const { data } = await supabase
       .from("songs")
-      .select("src, title, artist")
-      .eq("is_active", true)
-      .limit(1)
-      .maybeSingle();
-    return data;
+      .select("id, src, title, artist")
+      .order("created_at", { ascending: true });
+    return data ?? [];
   } catch {
-    return null;
+    return [];
   }
 }
 
@@ -36,7 +34,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const activeSong = await getActiveSong();
+  const songs = await getSongs();
 
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
@@ -44,7 +42,7 @@ export default async function RootLayout({
         <SessionValidator />
         <AmbientBackground />
         {children}
-        <MusicPlayer song={activeSong} />
+        <MusicPlayer songs={songs} />
       </body>
     </html>
   );
