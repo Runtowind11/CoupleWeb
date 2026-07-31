@@ -9,7 +9,11 @@ function formatTime(t: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-export default function MusicPlayer() {
+type MusicPlayerProps = {
+  song?: { src: string; title: string; artist: string } | null;
+};
+
+export default function MusicPlayer({ song }: MusicPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -17,6 +21,11 @@ export default function MusicPlayer() {
   const [duration, setDuration] = useState(0);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const winRef = useRef<HTMLDivElement>(null);
+
+  const audioSrc = song?.src ?? "/audio/bgm.mp3";
+  const songTitle = song
+    ? `${song.title}${song.artist ? ` - ${song.artist}` : ""}`
+    : "背景音乐";
   const dragRef = useRef({
     startX: 0,
     startY: 0,
@@ -170,7 +179,7 @@ export default function MusicPlayer() {
             <Music className="h-5 w-5" />
           )}
         </button>
-        <audio ref={audioRef} src="/audio/bgm.mp3" loop preload="metadata" />
+        <audio ref={audioRef} src={audioSrc} loop preload="metadata" />
       </div>
     );
   }
@@ -187,7 +196,7 @@ export default function MusicPlayer() {
       <div className="liquid-glass w-72 rounded-2xl p-4">
         <div className="flex items-center gap-2">
           <Music className="h-4 w-4 shrink-0 text-rose-500" />
-          <span className="truncate text-sm font-medium">背景音乐</span>
+          <span className="truncate text-sm font-medium">{songTitle}</span>
           <button
             type="button"
             onClick={() => setOpen(false)}
@@ -237,7 +246,7 @@ export default function MusicPlayer() {
           </button>
         </div>
       </div>
-      <audio ref={audioRef} src="/audio/bgm.mp3" loop preload="metadata" />
+      <audio ref={audioRef} src={audioSrc} loop preload="metadata" />
     </div>
   );
 }

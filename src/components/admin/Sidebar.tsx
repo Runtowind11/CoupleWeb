@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Newspaper, Images, LogOut, House, Menu, X, ShieldCheck, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Newspaper, Images, LogOut, House, Menu, X, ShieldCheck, MessageSquare, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -19,6 +19,7 @@ const baseNavItems = [
   { href: "/dashboard", label: "控制台", icon: LayoutDashboard },
   { href: "/dashboard/blog", label: "博客", icon: Newspaper },
   { href: "/dashboard/gallery", label: "相册", icon: Images },
+  { href: "/dashboard/music", label: "音乐", icon: Music },
 ];
 
 export default function Sidebar() {
