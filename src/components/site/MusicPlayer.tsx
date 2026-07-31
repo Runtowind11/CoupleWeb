@@ -24,6 +24,8 @@ type PlayMode = "single" | "sequence" | "shuffle";
 
 const STORAGE_KEY = "couple-music-state";
 
+const HAS_SUPABASE = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL);
+
 const MODE_ORDER: PlayMode[] = ["single", "sequence", "shuffle"];
 
 const MODE_META: Record<PlayMode, { icon: LucideIcon; label: string }> = {
@@ -300,7 +302,7 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
     setOpen(true);
   }
 
-  if (!authed) {
+  if (HAS_SUPABASE && !authed) {
     return null;
   }
 
