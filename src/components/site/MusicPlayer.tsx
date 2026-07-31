@@ -96,6 +96,8 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
     if (!audio) return;
 
     const onVisibility = () => {
+      const audio = audioRef.current;
+      if (!audio) return;
       if (document.hidden) {
         if (!audio.paused) audio.pause();
       } else if (playingRef.current && audio.paused) {
@@ -376,46 +378,49 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
 
   if (!open) {
     return (
-      <div
-        data-player-root=""
-        className="fixed z-50"
-        style={pos ? { left: pos.x, top: pos.y } : { right: 24, bottom: 24 }}
-      >
-        <button
-          type="button"
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onClick={handleClick}
-          aria-label="打开音乐播放器"
-          title="打开音乐播放器"
-          className="liquid-glass flex h-12 w-12 cursor-grab touch-none items-center justify-center rounded-full text-rose-500 transition-transform active:cursor-grabbing hover:scale-105"
+      <>
+        <div
+          data-player-root=""
+          className="fixed z-50"
+          style={pos ? { left: pos.x, top: pos.y } : { right: 24, bottom: 24 }}
         >
-          {playing ? (
-            <span className="flex h-4 items-end gap-[3px]">
-              <span className="animate-eq-1 h-full w-[3px] origin-bottom rounded-full bg-rose-500" />
-              <span className="animate-eq-2 h-full w-[3px] origin-bottom rounded-full bg-rose-500" />
-              <span className="animate-eq-3 h-full w-[3px] origin-bottom rounded-full bg-rose-500" />
-            </span>
-          ) : (
-            <Music className="h-5 w-5" />
-          )}
-        </button>
-        <audio ref={audioRef} src={audioSrc} preload="metadata" />
-      </div>
+          <button
+            type="button"
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onClick={handleClick}
+            aria-label="打开音乐播放器"
+            title="打开音乐播放器"
+            className="liquid-glass flex h-12 w-12 cursor-grab touch-none items-center justify-center rounded-full text-rose-500 transition-transform active:cursor-grabbing hover:scale-105"
+          >
+            {playing ? (
+              <span className="flex h-4 items-end gap-[3px]">
+                <span className="animate-eq-1 h-full w-[3px] origin-bottom rounded-full bg-rose-500" />
+                <span className="animate-eq-2 h-full w-[3px] origin-bottom rounded-full bg-rose-500" />
+                <span className="animate-eq-3 h-full w-[3px] origin-bottom rounded-full bg-rose-500" />
+              </span>
+            ) : (
+              <Music className="h-5 w-5" />
+            )}
+          </button>
+        </div>
+        <audio key="player-audio" ref={audioRef} src={audioSrc} preload="metadata" />
+      </>
     );
   }
 
   return (
-    <div
-      ref={winRef}
-      data-player-root=""
-      onPointerDown={onWinPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      className="fixed z-50 cursor-grab touch-none active:cursor-grabbing"
-      style={pos ? { left: pos.x, top: pos.y } : { right: 16, bottom: 16 }}
-    >
+    <>
+      <div
+        ref={winRef}
+        data-player-root=""
+        onPointerDown={onWinPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        className="fixed z-50 cursor-grab touch-none active:cursor-grabbing"
+        style={pos ? { left: pos.x, top: pos.y } : { right: 16, bottom: 16 }}
+      >
       <div className="liquid-glass w-72 rounded-2xl p-4">
         <div className="flex items-center gap-2">
           <Music className="h-4 w-4 shrink-0 text-rose-500" />
@@ -478,7 +483,8 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
           </button>
         </div>
       </div>
-      <audio ref={audioRef} src={audioSrc} preload="metadata" />
     </div>
+      <audio key="player-audio" ref={audioRef} src={audioSrc} preload="metadata" />
+    </>
   );
 }
