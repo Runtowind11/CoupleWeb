@@ -188,6 +188,19 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
     };
   }, [mode, songs, currentId]);
 
+  useEffect(() => {
+    if (pos || pathname !== "/") return;
+
+    const timer = setTimeout(() => {
+      const logo = document.querySelector<HTMLElement>("#site-logo");
+      if (!logo) return;
+      const rect = logo.getBoundingClientRect();
+      if (rect.width === 0) return;
+      setPos({ x: Math.max(rect.left, 8), y: rect.bottom + 12 });
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [pathname, pos]);
+
   useLayoutEffect(() => {
     if (!open) return;
     const el = winRef.current;
