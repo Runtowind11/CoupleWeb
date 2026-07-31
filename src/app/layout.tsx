@@ -4,6 +4,7 @@ import "./globals.css";
 import SessionValidator from "@/components/SessionValidator";
 import AmbientBackground from "@/components/site/AmbientBackground";
 import MusicPlayer, { type MusicSong } from "@/components/site/MusicPlayer";
+import { ThemeProvider } from "@/components/theme-provider";
 import { createClient } from "@/lib/supabase/server";
 
 const inter = Inter({
@@ -37,12 +38,23 @@ export default async function RootLayout({
   const songs = await getSongs();
 
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">
-        <SessionValidator />
-        <AmbientBackground />
-        {children}
-        <MusicPlayer songs={songs} />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SessionValidator />
+          <AmbientBackground />
+          {children}
+          <MusicPlayer songs={songs} />
+        </ThemeProvider>
       </body>
     </html>
   );
