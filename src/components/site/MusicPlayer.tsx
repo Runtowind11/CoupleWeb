@@ -92,8 +92,14 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
   }, [playing]);
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const isMobile =
+      typeof navigator !== "undefined" &&
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    const pauseAudio = () => {
+      const audio = audioRef.current;
+      if (audio && !audio.paused) audio.pause();
+    };
 
     const onVisibility = () => {
       const audio = audioRef.current;
@@ -105,8 +111,33 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
       }
     };
 
+    const onBlur = () => {
+      if (isMobile) pauseAudio();
+    };
+
+    const onPageHide = () => {
+      if (isMobile) pauseAudio();
+    };
+
+    const onFocus = () => {
+      if (!isMobile) return;
+      const audio = audioRef.current;
+      if (!audio) return;
+      if (playingRef.current && audio.paused && !document.hidden) {
+        attemptPlay();
+      }
+    };
+
     document.addEventListener("visibilitychange", onVisibility);
-    return () => document.removeEventListener("visibilitychange", onVisibility);
+    window.addEventListener("blur", onBlur);
+    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("focus", onFocus);
+    };
   }, [attemptPlay]);
 
   const currentSong = songs.find((s) => s.id === currentId) ?? null;
