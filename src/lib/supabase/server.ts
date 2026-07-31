@@ -14,8 +14,7 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            const { maxAge: _, ...sessionOptions } = options;
-            cookieStore.set(name, value, sessionOptions);
+            cookieStore.set(name, value, options);
           });
         },
       },

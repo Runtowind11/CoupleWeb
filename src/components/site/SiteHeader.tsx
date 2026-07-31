@@ -3,7 +3,7 @@ import { Heart } from "lucide-react";
 
 export default function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-white/50 bg-white/40 shadow-[inset_0_-1px_0_0_rgb(255_255_255_/_0.25)] backdrop-blur-xl backdrop-saturate-150">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2">
           <Heart className="h-5 w-5 fill-rose-500 text-rose-500" />
@@ -35,7 +35,7 @@ export default function SiteHeader() {
             管理
           </Link>
           <a
-            href="https://node.taild96dec.ts.net/"
+            href="http://100.121.121.31:3001"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"

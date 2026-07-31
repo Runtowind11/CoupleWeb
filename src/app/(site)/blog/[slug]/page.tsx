@@ -26,7 +26,7 @@ export default async function BlogPostPage({
   }
 
   return (
-    <div className="flex-1 bg-linear-to-b from-rose-50 to-white">
+    <div className="flex-1">
       <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
         <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">

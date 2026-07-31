@@ -3,9 +3,9 @@ import { Heart } from "lucide-react";
 
 export default function AboutPage() {
   return (
-    <div className="flex-1 bg-linear-to-b from-rose-50 to-white">
+    <div className="flex-1">
       <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
-        <Card className="border-rose-200/50">
+        <Card className="rounded-3xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
               <Heart className="h-5 w-5 fill-rose-500 text-rose-500" />

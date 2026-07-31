@@ -30,8 +30,8 @@ function LoginForm() {
   }, [state.pending, state.email, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-rose-100 to-purple-100 px-4">
-      <Card className="w-full max-w-sm">
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <Card className="w-full max-w-sm rounded-3xl">
         <CardHeader className="items-center text-center">
           <Heart className="mb-2 h-8 w-8 fill-rose-500 text-rose-500" />
           <CardTitle className="text-xl">管理员登录</CardTitle>

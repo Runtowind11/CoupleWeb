@@ -9,16 +9,15 @@ import { checkApproval } from "../actions";
 export default function PendingPage() {
   const router = useRouter();
   const [status, setStatus] = useState<"pending" | "approved" | "denied" | "expired">("pending");
-  const [email, setEmail] = useState("");
+  const [email] = useState(() =>
+    typeof window !== "undefined" ? (sessionStorage.getItem("pending_email") ?? "") : "",
+  );
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("pending_email");
-    if (!stored) {
+    if (!email) {
       router.replace("/login");
-      return;
     }
-    setEmail(stored);
-  }, [router]);
+  }, [email, router]);
 
   useEffect(() => {
     if (!email) return;
@@ -53,8 +52,8 @@ export default function PendingPage() {
   }, [email, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-rose-100 to-purple-100 px-4">
-      <Card className="w-full max-w-sm text-center">
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <Card className="w-full max-w-sm rounded-3xl text-center">
         <CardHeader className="items-center">
           <ShieldAlert className="mb-2 h-10 w-10 text-amber-500" />
           <CardTitle className="text-xl">
