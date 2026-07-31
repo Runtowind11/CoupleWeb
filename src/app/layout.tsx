@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import SessionValidator from "@/components/SessionValidator";
+import AmbientBackground from "@/components/site/AmbientBackground";
+import MusicPlayer from "@/components/site/MusicPlayer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,7 +24,9 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <SessionValidator />
+        <AmbientBackground />
         {children}
+        <MusicPlayer />
       </body>
     </html>
   );
