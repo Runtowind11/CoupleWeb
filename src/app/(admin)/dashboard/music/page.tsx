@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
-import { deleteSong, setActiveSong, uploadSong } from "./actions";
+import { deleteSong, setActiveSong } from "./actions";
+import UploadSongForm from "./UploadSongForm";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Music, Play, Trash2, Upload } from "lucide-react";
+import { Music, Play, Trash2 } from "lucide-react";
 
 export default async function MusicPage() {
   const supabase = await createClient();
@@ -19,23 +19,7 @@ export default async function MusicPage() {
         <p className="mt-1 text-muted-foreground">上传歌曲并设置主页播放器播放的音乐</p>
       </div>
 
-      <form action={uploadSong} className="flex flex-wrap items-end gap-4 rounded-xl border p-4">
-        <div className="min-w-40 flex-1 space-y-2">
-          <label htmlFor="title" className="text-sm font-medium">歌曲名</label>
-          <Input id="title" name="title" placeholder="例如：我们的歌" />
-        </div>
-        <div className="min-w-32 flex-1 space-y-2">
-          <label htmlFor="artist" className="text-sm font-medium">歌手（可选）</label>
-          <Input id="artist" name="artist" placeholder="例如：张三" />
-        </div>
-        <div className="min-w-52 flex-1 space-y-2">
-          <label htmlFor="file" className="text-sm font-medium">文件</label>
-          <Input id="file" name="file" type="file" accept="audio/*" required />
-        </div>
-        <Button type="submit" className="shrink-0">
-          <Upload className="h-4 w-4" /> 上传
-        </Button>
-      </form>
+      <UploadSongForm />
 
       <div className="space-y-3">
         {songs && songs.length > 0 ? (
