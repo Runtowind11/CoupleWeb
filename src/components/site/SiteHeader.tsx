@@ -35,7 +35,7 @@ export default function SiteHeader() {
             管理
           </Link>
           <a
-            href="http://100.121.121.31:3001"
+            href="https://node.taild96dec.ts.net/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
