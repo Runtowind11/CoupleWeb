@@ -1,7 +1,35 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Music, Pause, Play, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import {
+  Music,
+  Pause,
+  Play,
+  Repeat,
+  Repeat1,
+  Shuffle,
+  X,
+  type LucideIcon,
+} from "lucide-react";
+
+export type MusicSong = { id: string; src: string; title: string; artist: string };
+
+type MusicPlayerProps = {
+  songs: MusicSong[];
+};
+
+type PlayMode = "single" | "sequence" | "shuffle";
+
+const STORAGE_KEY = "couple-music-state";
+
+const MODE_ORDER: PlayMode[] = ["single", "sequence", "shuffle"];
+
+const MODE_META: Record<PlayMode, { icon: LucideIcon; label: string }> = {
+  single: { icon: Repeat1, label: "单曲循环" },
+  sequence: { icon: Repeat, label: "顺序播放" },
+  shuffle: { icon: Shuffle, label: "随机播放" },
+};
 
 function formatTime(t: number) {
   const m = Math.floor(t / 60);
@@ -9,11 +37,21 @@ function formatTime(t: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-type MusicPlayerProps = {
-  song?: { src: string; title: string; artist: string } | null;
-};
+function loadSaved(): { songId: string; mode: PlayMode } | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (typeof parsed?.songId !== "string") return null;
+    const mode: PlayMode = MODE_ORDER.includes(parsed.mode) ? parsed.mode : "sequence";
+    return { songId: parsed.songId, mode };
+  } catch {
+    return null;
+  }
+}
 
-export default function MusicPlayer({ song }: MusicPlayerProps) {
+export default function MusicPlayer({ songs }: MusicPlayerProps) {
+  const pathname = usePathname();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -21,19 +59,68 @@ export default function MusicPlayer({ song }: MusicPlayerProps) {
   const [duration, setDuration] = useState(0);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const winRef = useRef<HTMLDivElement>(null);
+  const [currentId, setCurrentId] = useState<string | null>(songs[0]?.id ?? null);
+  const [mode, setMode] = useState<PlayMode>("sequence");
+  const [resyncTick, setResyncTick] = useState(0);
+  const pendingPlayRef = useRef(false);
+  const autoAttemptedRef = useRef(false);
+  const restoredRef = useRef(false);
 
-  const audioSrc = song?.src ?? "/audio/bgm.mp3";
-  const songTitle = song
-    ? `${song.title}${song.artist ? ` - ${song.artist}` : ""}`
+  const currentSong = songs.find((s) => s.id === currentId) ?? null;
+  const audioSrc = currentSong?.src ?? "/audio/bgm.mp3";
+  const songTitle = currentSong
+    ? `${currentSong.title}${currentSong.artist ? ` - ${currentSong.artist}` : ""}`
     : "背景音乐";
-  const dragRef = useRef({
-    startX: 0,
-    startY: 0,
-    baseX: 0,
-    baseY: 0,
-    moved: false,
-    dragging: false,
-  });
+  const ModeIcon = MODE_META[mode].icon;
+
+  useEffect(() => {
+    if (!restoredRef.current) {
+      const saved = loadSaved();
+      const timer = setTimeout(() => {
+        restoredRef.current = true;
+        const targetId =
+          saved && songs.some((s) => s.id === saved.songId)
+            ? saved.songId
+            : (songs[0]?.id ?? null);
+        const targetMode =
+          saved && MODE_ORDER.includes(saved.mode) ? saved.mode : "sequence";
+        setCurrentId(targetId);
+        setMode(targetMode);
+        setResyncTick((t) => t + 1);
+        if (pathname === "/") {
+          autoAttemptedRef.current = true;
+          pendingPlayRef.current = true;
+        }
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+
+    if (pathname === "/" && !autoAttemptedRef.current && !playing) {
+      autoAttemptedRef.current = true;
+      pendingPlayRef.current = true;
+      setResyncTick((t) => t + 1);
+    }
+  }, [pathname, songs, playing]);
+
+  useEffect(() => {
+    if (!currentId) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ songId: currentId, mode }));
+    } catch {
+      /* ignore */
+    }
+  }, [currentId, mode]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.src = audioSrc;
+    if (pendingPlayRef.current) {
+      pendingPlayRef.current = false;
+      audio.currentTime = 0;
+      audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    }
+  }, [currentId, audioSrc, resyncTick]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -41,7 +128,25 @@ export default function MusicPlayer({ song }: MusicPlayerProps) {
 
     const onTime = () => setCurrent(audio.currentTime);
     const onLoaded = () => setDuration(audio.duration || 0);
-    const onEnded = () => setPlaying(false);
+    const onEnded = () => {
+      if (mode === "single" || songs.length === 0) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+        return;
+      }
+
+      const index = songs.findIndex((s) => s.id === currentId);
+      let next = index;
+      if (mode === "shuffle") {
+        next = Math.floor(Math.random() * songs.length);
+        if (songs.length > 1 && next === index) next = (next + 1) % songs.length;
+      } else {
+        next = (index + 1) % songs.length;
+      }
+
+      pendingPlayRef.current = true;
+      setCurrentId(songs[next].id);
+    };
 
     audio.addEventListener("timeupdate", onTime);
     audio.addEventListener("loadedmetadata", onLoaded);
@@ -51,7 +156,7 @@ export default function MusicPlayer({ song }: MusicPlayerProps) {
       audio.removeEventListener("loadedmetadata", onLoaded);
       audio.removeEventListener("ended", onEnded);
     };
-  }, []);
+  }, [mode, songs, currentId]);
 
   useLayoutEffect(() => {
     if (!open) return;
@@ -75,6 +180,11 @@ export default function MusicPlayer({ song }: MusicPlayerProps) {
     } else {
       audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
     }
+  }
+
+  function cycleMode() {
+    const next = MODE_ORDER[(MODE_ORDER.indexOf(mode) + 1) % MODE_ORDER.length];
+    setMode(next);
   }
 
   function seek(e: React.MouseEvent<HTMLDivElement>) {
@@ -104,6 +214,15 @@ export default function MusicPlayer({ song }: MusicPlayerProps) {
     };
     el.setPointerCapture(e.pointerId);
   }
+
+  const dragRef = useRef({
+    startX: 0,
+    startY: 0,
+    baseX: 0,
+    baseY: 0,
+    moved: false,
+    dragging: false,
+  });
 
   function onPointerMove(e: React.PointerEvent<HTMLElement>) {
     const drag = dragRef.current;
@@ -179,7 +298,7 @@ export default function MusicPlayer({ song }: MusicPlayerProps) {
             <Music className="h-5 w-5" />
           )}
         </button>
-        <audio ref={audioRef} src={audioSrc} loop preload="metadata" />
+        <audio ref={audioRef} src={audioSrc} preload="metadata" />
       </div>
     );
   }
@@ -230,7 +349,16 @@ export default function MusicPlayer({ song }: MusicPlayerProps) {
           <span>{duration ? formatTime(duration) : "--:--"}</span>
         </div>
 
-        <div className="mt-2 flex justify-center">
+        <div className="mt-2 flex items-center justify-center gap-4">
+          <button
+            type="button"
+            onClick={cycleMode}
+            aria-label={`播放模式：${MODE_META[mode].label}`}
+            title={`播放模式：${MODE_META[mode].label}（点击切换）`}
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-rose-500 transition-transform hover:scale-105 hover:bg-white/30"
+          >
+            <ModeIcon className="h-5 w-5" />
+          </button>
           <button
             type="button"
             onClick={toggle}
@@ -246,7 +374,7 @@ export default function MusicPlayer({ song }: MusicPlayerProps) {
           </button>
         </div>
       </div>
-      <audio ref={audioRef} src={audioSrc} loop preload="metadata" />
+      <audio ref={audioRef} src={audioSrc} preload="metadata" />
     </div>
   );
 }
