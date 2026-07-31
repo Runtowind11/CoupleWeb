@@ -69,6 +69,27 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
   const pendingPlayRef = useRef(false);
   const autoAttemptedRef = useRef(false);
   const restoredRef = useRef(false);
+  const playingRef = useRef(false);
+
+  useEffect(() => {
+    playingRef.current = playing;
+  }, [playing]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        if (!audio.paused) audio.pause();
+      } else if (playingRef.current && audio.paused) {
+        audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, []);
 
   const currentSong = songs.find((s) => s.id === currentId) ?? null;
   const audioSrc = currentSong?.src ?? "/audio/bgm.mp3";
@@ -151,7 +172,9 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
     if (pendingPlayRef.current) {
       pendingPlayRef.current = false;
       audio.currentTime = 0;
-      audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      if (!document.hidden) {
+        audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      }
     }
   }, [currentId, audioSrc, resyncTick, authed]);
 
