@@ -96,7 +96,7 @@ export default function MusicPlayer() {
     el.setPointerCapture(e.pointerId);
   }
 
-  function onPointerMove(e: React.PointerEvent<HTMLButtonElement>) {
+  function onPointerMove(e: React.PointerEvent<HTMLElement>) {
     const drag = dragRef.current;
     if (!drag.dragging) return;
 
@@ -105,13 +105,35 @@ export default function MusicPlayer() {
     if (!drag.moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
     drag.moved = true;
 
-    const x = Math.min(Math.max(drag.baseX + dx, 8), window.innerWidth - 56);
-    const y = Math.min(Math.max(drag.baseY + dy, 8), window.innerHeight - 56);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.min(Math.max(drag.baseX + dx, 12), window.innerWidth - rect.width - 12);
+    const y = Math.min(Math.max(drag.baseY + dy, 12), window.innerHeight - rect.height - 12);
     setPos({ x, y });
   }
 
   function onPointerUp() {
     dragRef.current.dragging = false;
+  }
+
+  function onWinPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest('[role="slider"]')) return;
+
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const base = pos ?? {
+      x: Math.max(window.innerWidth - rect.width - 16, 12),
+      y: Math.max(window.innerHeight - rect.height - 16, 12),
+    };
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      baseX: base.x,
+      baseY: base.y,
+      moved: false,
+      dragging: true,
+    };
+    el.setPointerCapture(e.pointerId);
   }
 
   function handleClick() {
@@ -156,7 +178,10 @@ export default function MusicPlayer() {
   return (
     <div
       ref={winRef}
-      className="fixed z-50"
+      onPointerDown={onWinPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      className="fixed z-50 cursor-grab touch-none active:cursor-grabbing"
       style={pos ? { left: pos.x, top: pos.y } : { right: 16, bottom: 16 }}
     >
       <div className="liquid-glass w-72 rounded-2xl p-4">
