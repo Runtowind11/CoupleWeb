@@ -106,7 +106,7 @@ export default function AmbientBackground() {
         />
       ))}
 
-      <div className="absolute inset-x-0 bottom-0 flex justify-center pb-[6vh]">
+      <div className="absolute inset-x-0 bottom-0 flex justify-center pb-[14vh]">
         <p className="font-handwriting text-rose-500/8 text-[clamp(2.25rem,10vw,5rem)] leading-none whitespace-nowrap select-none">
           {WELCOME_TEXT}
         </p>
