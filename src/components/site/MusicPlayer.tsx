@@ -15,6 +15,15 @@ export default function MusicPlayer() {
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const dragRef = useRef({
+    startX: 0,
+    startY: 0,
+    baseX: 0,
+    baseY: 0,
+    moved: false,
+    dragging: false,
+  });
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -56,15 +65,65 @@ export default function MusicPlayer() {
     setCurrent(audio.currentTime);
   }
 
+  function onPointerDown(e: React.PointerEvent<HTMLButtonElement>) {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const base = pos ?? {
+      x: Math.max(window.innerWidth - rect.width - 24, 8),
+      y: Math.max(window.innerHeight - rect.height - 24, 8),
+    };
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      baseX: base.x,
+      baseY: base.y,
+      moved: false,
+      dragging: true,
+    };
+    el.setPointerCapture(e.pointerId);
+  }
+
+  function onPointerMove(e: React.PointerEvent<HTMLButtonElement>) {
+    const drag = dragRef.current;
+    if (!drag.dragging) return;
+
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+    if (!drag.moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+    drag.moved = true;
+
+    const x = Math.min(Math.max(drag.baseX + dx, 8), window.innerWidth - 56);
+    const y = Math.min(Math.max(drag.baseY + dy, 8), window.innerHeight - 56);
+    setPos({ x, y });
+  }
+
+  function onPointerUp() {
+    dragRef.current.dragging = false;
+  }
+
+  function handleClick() {
+    if (dragRef.current.moved) {
+      dragRef.current.moved = false;
+      return;
+    }
+    setOpen(true);
+  }
+
   if (!open) {
     return (
-      <div className="fixed right-6 bottom-6 z-50">
+      <div
+        className="fixed z-50"
+        style={pos ? { left: pos.x, top: pos.y } : { right: 24, bottom: 24 }}
+      >
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onClick={handleClick}
           aria-label="打开音乐播放器"
           title="打开音乐播放器"
-          className="liquid-glass flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-rose-500 transition-transform hover:scale-105"
+          className="liquid-glass flex h-12 w-12 cursor-grab touch-none items-center justify-center rounded-full text-rose-500 transition-transform active:cursor-grabbing hover:scale-105"
         >
           {playing ? (
             <span className="flex h-4 items-end gap-[3px]">
