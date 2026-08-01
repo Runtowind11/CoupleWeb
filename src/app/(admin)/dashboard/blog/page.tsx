@@ -51,6 +51,7 @@ export default async function BlogManagePage() {
                 <TableCell className="font-medium">{post.title}</TableCell>
                 <TableCell className="text-muted-foreground">
                   {new Date(post.created_at).toLocaleString("zh-CN", {
+                    timeZone: "Asia/Shanghai",
                     year: "numeric",
                     month: "2-digit",
                     day: "2-digit",
