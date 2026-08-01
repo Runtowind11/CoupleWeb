@@ -31,6 +31,7 @@ export default async function BlogPage() {
                   <CalendarDays className="h-4 w-4" />
                   <time dateTime={post.created_at}>
                     {new Date(post.created_at).toLocaleString("zh-CN", {
+                      timeZone: "Asia/Shanghai",
                       year: "numeric",
                       month: "2-digit",
                       day: "2-digit",
