@@ -30,7 +30,14 @@ export default async function BlogPage() {
                 <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                   <CalendarDays className="h-4 w-4" />
                   <time dateTime={post.created_at}>
-                    {new Date(post.created_at).toLocaleDateString("zh-CN")}
+                    {new Date(post.created_at).toLocaleString("zh-CN", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })}
                   </time>
                 </div>
               </article>
