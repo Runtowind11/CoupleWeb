@@ -5,7 +5,10 @@ import { createClient } from "@/lib/supabase/server";
 
 type ActionResult = { success: boolean; error?: string };
 
-export async function createPost(formData: FormData): Promise<ActionResult> {
+export async function createPost(
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
   const supabase = await createClient();
 
   const title = formData.get("title") as string;
@@ -37,7 +40,11 @@ export async function createPost(formData: FormData): Promise<ActionResult> {
   return { success: true };
 }
 
-export async function updatePost(id: string, formData: FormData): Promise<ActionResult> {
+export async function updatePost(
+  id: string,
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
   const supabase = await createClient();
 
   const title = formData.get("title") as string;
