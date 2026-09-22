@@ -8,9 +8,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { deletePost } from "./actions";
+import DeletePostButton from "./DeletePostButton";
 
 export default async function BlogManagePage() {
   const supabase = await createClient();
@@ -67,11 +67,7 @@ export default async function BlogManagePage() {
                         <Pencil className="h-4 w-4" />
                       </Button>
                     </Link>
-                    <form action={deletePost.bind(null, post.id)}>
-                      <Button type="submit" variant="ghost" size="icon-sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </form>
+                    <DeletePostButton postId={post.id} />
                   </div>
                 </TableCell>
               </TableRow>
