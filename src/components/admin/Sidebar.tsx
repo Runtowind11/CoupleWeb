@@ -1,17 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Newspaper, Images, LogOut, House, Menu, X, MessageSquare, Music } from "lucide-react";
+import { LayoutDashboard, Newspaper, Images, LogOut, House, Menu, X, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import { logout } from "@/app/(admin)/actions";
 
-const MAIN_ADMIN_EMAIL = "3275239616@qq.com";
-
-const baseNavItems = [
+const navItems = [
   { href: "/dashboard", label: "控制台", icon: LayoutDashboard },
   { href: "/dashboard/blog", label: "博客", icon: Newspaper },
   { href: "/dashboard/gallery", label: "相册", icon: Images },
@@ -25,20 +22,6 @@ function handleLogout() {
 export default function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const [isMainAdmin, setIsMainAdmin] = useState(false);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      if (data?.user?.email === MAIN_ADMIN_EMAIL) {
-        setIsMainAdmin(true);
-      }
-    });
-  }, []);
-
-  const navItems = isMainAdmin
-    ? [...baseNavItems, { href: "/dashboard/messages", label: "消息", icon: MessageSquare }]
-    : baseNavItems;
 
   function close() {
     setIsOpen(false);
