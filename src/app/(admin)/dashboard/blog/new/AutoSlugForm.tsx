@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,6 +23,7 @@ export default function AutoSlugForm() {
     success: false,
   });
   const [dialogOpen, setDialogOpen] = useState(false);
+  const justOpenedRef = useRef(false);
   const router = useRouter();
 
   const slug = titleToSlug(title) || "untitled";
@@ -30,8 +31,18 @@ export default function AutoSlugForm() {
   useEffect(() => {
     if (state.success !== undefined && state.success !== false) {
       setDialogOpen(true);
+      justOpenedRef.current = true;
+      const t = setTimeout(() => {
+        justOpenedRef.current = false;
+      }, 300);
+      return () => clearTimeout(t);
     } else if (state.error) {
       setDialogOpen(true);
+      justOpenedRef.current = true;
+      const t = setTimeout(() => {
+        justOpenedRef.current = false;
+      }, 300);
+      return () => clearTimeout(t);
     }
   }, [state]);
 
@@ -45,6 +56,7 @@ export default function AutoSlugForm() {
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
+      if (justOpenedRef.current) return;
       handleDialogClose();
     }
   };
