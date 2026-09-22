@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 type ActionResult = { success: boolean; error?: string };
@@ -34,7 +33,6 @@ export async function createPost(formData: FormData): Promise<ActionResult> {
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/dashboard/blog");
   return { success: true };
 }
 
@@ -55,7 +53,6 @@ export async function updatePost(id: string, formData: FormData): Promise<Action
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/dashboard/blog");
   return { success: true };
 }
 

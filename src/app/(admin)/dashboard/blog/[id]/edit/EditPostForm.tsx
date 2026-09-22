@@ -44,6 +44,13 @@ export default function EditPostForm({ post }: { post: Post }) {
     setDialogOpen(false);
     if (state.success) {
       router.push("/dashboard/blog");
+      router.refresh();
+    }
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      handleDialogClose();
     }
   };
 
@@ -88,7 +95,7 @@ export default function EditPostForm({ post }: { post: Post }) {
         </Button>
       </form>
 
-      <Dialog open={dialogOpen} onOpenChange={handleDialogClose}>
+      <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{state.success ? "提交成功" : "提交失败"}</DialogTitle>
