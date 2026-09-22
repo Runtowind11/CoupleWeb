@@ -8,7 +8,7 @@
 - 📝 博客系统：Markdown 写作、发布、编辑与删除
 - 📷 相册：图片上传、浏览与删除
 - 🔐 管理员登录：主管理员与副管理员凭邮箱密码直接登录
-- 📊 管理后台：文章 / 相册 / 登录日志管理
+- 📊 管理后台：文章 / 相册管理
 - 🎨 液态玻璃质感界面（毛玻璃 + 光斑背景 + 内高光）
 - 🎬 观影平台入口
 
@@ -45,23 +45,18 @@ pnpm dev
 
 ## 数据库
 
-数据库使用 Supabase（PostgreSQL），核心业务表（`admins` / `photos` / `posts`）在线上 Supabase 控制台中手动创建，迁移脚本 `supabase/migrations/` 负责维护行级安全（RLS）策略与登录日志表：
+数据库使用 Supabase（PostgreSQL），核心业务表（`admins` / `photos` / `posts`）在线上 Supabase 控制台中手动创建，迁移脚本 `supabase/migrations/` 负责维护行级安全（RLS）策略：
 
 | 文件 | 说明 |
 |---|---|
 | `202607150001_enable_rls_admins.sql` | admins / photos / posts 行级安全（RLS）策略 |
-| `202607270001_create_admin_login_logs.sql` | 副管理员登录日志表 |
-| `202607270002_add_delete_policy_admin_login_logs.sql` | 日志删除策略 |
 
 存储桶：`photos`（相册图片）、`posts-images`（文章插图），均为公开桶，在 Supabase 控制台中配置。
-
-> 如需从零重建数据库，可参考公开仓库 [CoupleWeb](https://github.com/Runtowind11/CoupleWeb) 中的完整迁移脚本与部署指南。
 
 ## 后台管理
 
 - 访问 `/dashboard` 进入管理后台（需管理员登录）
 - 文章管理：`/dashboard/blog`；相册管理：`/dashboard/gallery`
-- 登录日志：`/dashboard/messages`（记录副管理员登录时间，可一键清空）
 
 ## 目录结构
 
@@ -70,7 +65,7 @@ src/
 ├── app/
 │   ├── (site)/        # 前台页面：首页 / 关于 / 博客 / 相册
 │   ├── (auth)/        # 登录页
-│   └── (admin)/       # 后台：控制台 / 博客 / 相册 / 消息
+│   └── (admin)/       # 后台：控制台 / 博客 / 相册
 ├── components/
 │   ├── site/          # 前台组件（头部、底部、Hero、灯箱等）
 │   ├── admin/         # 后台组件（侧边栏、Markdown 编辑器等）
