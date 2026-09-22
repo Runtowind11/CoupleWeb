@@ -1,10 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export async function createPost(formData: FormData) {
+type ActionResult = { success: boolean; error?: string };
+
+export async function createPost(formData: FormData): Promise<ActionResult> {
   const supabase = await createClient();
 
   const title = formData.get("title") as string;
@@ -30,14 +31,14 @@ export async function createPost(formData: FormData) {
       continue;
     }
 
-    throw new Error(error.message);
+    return { success: false, error: error.message };
   }
 
   revalidatePath("/dashboard/blog");
-  redirect("/dashboard/blog");
+  return { success: true };
 }
 
-export async function updatePost(id: string, formData: FormData) {
+export async function updatePost(id: string, formData: FormData): Promise<ActionResult> {
   const supabase = await createClient();
 
   const title = formData.get("title") as string;
@@ -51,11 +52,11 @@ export async function updatePost(id: string, formData: FormData) {
     .eq("id", id);
 
   if (error) {
-    throw new Error(error.message);
+    return { success: false, error: error.message };
   }
 
   revalidatePath("/dashboard/blog");
-  redirect("/dashboard/blog");
+  return { success: true };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
