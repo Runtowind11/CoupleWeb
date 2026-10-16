@@ -19,15 +19,15 @@ export default async function GalleryManagePage() {
 
       <form
         action={uploadPhoto}
-        className="flex items-end gap-4 rounded-xl border p-4"
+        className="flex flex-col items-stretch gap-4 rounded-xl border p-4 sm:flex-row sm:items-end"
       >
-        <div className="flex-1 space-y-2">
+        <div className="space-y-2 sm:flex-1">
           <label htmlFor="alt" className="text-sm font-medium">
             描述
           </label>
           <Input id="alt" name="alt" placeholder="图片描述" />
         </div>
-        <div className="flex-1 space-y-2">
+        <div className="space-y-2 sm:flex-1">
           <label htmlFor="file" className="text-sm font-medium">
             文件
           </label>
