@@ -372,7 +372,8 @@ export default function MusicPlayer({ songs, authed }: MusicPlayerProps) {
     setOpen(true);
   }
 
-  if (!authed) {
+  // 未登录不显示；登录页也不显示（含被登出后客户端跳转到登录页、根布局未重新渲染的情形）
+  if (!authed || pathname === "/login") {
     return null;
   }
 
@@ -392,7 +393,7 @@ export default function MusicPlayer({ songs, authed }: MusicPlayerProps) {
             onClick={handleClick}
             aria-label="打开音乐播放器"
             title="打开音乐播放器"
-            className="glass-solid flex h-12 w-12 cursor-grab touch-none items-center justify-center rounded-full text-rose-500 transition-transform active:cursor-grabbing hover:scale-105"
+            className="liquid-glass flex h-12 w-12 cursor-grab touch-none items-center justify-center rounded-full text-rose-500 transition-transform active:cursor-grabbing hover:scale-105"
           >
             {playing ? (
               <span className="flex h-4 items-end gap-[3px]">
