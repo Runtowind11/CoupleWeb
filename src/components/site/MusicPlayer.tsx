@@ -12,19 +12,18 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-
 export type MusicSong = { id: string; src: string; title: string; artist: string };
 
 type MusicPlayerProps = {
   songs: MusicSong[];
+  // 登录态由服务端（根布局，与 middleware 读同一份会话）判定后传入，
+  // 不再依赖浏览器端 SDK 的 auth 事件
+  authed: boolean;
 };
 
 type PlayMode = "single" | "sequence" | "shuffle";
 
 const STORAGE_KEY = "couple-music-state";
-
-const HAS_SUPABASE = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL);
 
 const MODE_ORDER: PlayMode[] = ["single", "sequence", "shuffle"];
 
@@ -53,10 +52,9 @@ function loadSaved(): { songId: string; mode: PlayMode } | null {
   }
 }
 
-export default function MusicPlayer({ songs }: MusicPlayerProps) {
+export default function MusicPlayer({ songs, authed }: MusicPlayerProps) {
   const pathname = usePathname();
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [authed, setAuthed] = useState(false);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -146,35 +144,6 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
     ? `${currentSong.title}${currentSong.artist ? ` - ${currentSong.artist}` : ""}`
     : "背景音乐";
   const ModeIcon = MODE_META[mode].icon;
-
-  useEffect(() => {
-    let supabase;
-    try {
-      supabase = createClient();
-    } catch {
-      return;
-    }
-
-    let mounted = true;
-    const check = () =>
-      supabase.auth
-        .getUser()
-        .then(({ data }) => {
-          if (mounted) setAuthed(Boolean(data?.user));
-        })
-        .catch(() => {});
-
-    check();
-
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (mounted) setAuthed(Boolean(session?.user));
-    });
-
-    return () => {
-      mounted = false;
-      sub.subscription.unsubscribe();
-    };
-  }, [pathname]);
 
   useEffect(() => {
     if (!restoredRef.current) {
@@ -403,7 +372,7 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
     setOpen(true);
   }
 
-  if (HAS_SUPABASE && !authed) {
+  if (!authed) {
     return null;
   }
 

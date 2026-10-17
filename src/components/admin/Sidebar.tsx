@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { logout } from "@/app/(admin)/actions";
+import { clearAdminSession } from "@/lib/admin-session";
 
 function handleLogout() {
-  sessionStorage.removeItem("admin_session");
+  clearAdminSession();
 }
 
 const APPROVER_EMAIL = "3275239616@qq.com";

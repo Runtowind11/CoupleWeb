@@ -18,16 +18,22 @@ export const metadata: Metadata = {
   description: "A love story website",
 };
 
-async function getSongs(): Promise<MusicSong[]> {
+// 播放器需要的数据：歌曲列表 + 当前是否已登录。
+// 登录态必须由服务端判定（与 middleware 读同一份 cookie 会话）：
+// 浏览器端 SDK 的 auth 事件在手机上可能先把本地会话丢掉，会让图标在刷新后消失。
+async function getPlayerData(): Promise<{ songs: MusicSong[]; authed: boolean }> {
   try {
     const supabase = await createClient();
-    const { data } = await supabase
-      .from("songs")
-      .select("id, src, title, artist")
-      .order("created_at", { ascending: true });
-    return data ?? [];
+    const [{ data: songs }, { data: userData }] = await Promise.all([
+      supabase
+        .from("songs")
+        .select("id, src, title, artist")
+        .order("created_at", { ascending: true }),
+      supabase.auth.getUser(),
+    ]);
+    return { songs: songs ?? [], authed: Boolean(userData?.user) };
   } catch {
-    return [];
+    return { songs: [], authed: false };
   }
 }
 
@@ -36,7 +42,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const songs = await getSongs();
+  const { songs, authed } = await getPlayerData();
 
   return (
     <html
@@ -55,7 +61,7 @@ export default async function RootLayout({
           <AmbientBackground />
           <SkyToneSync />
           {children}
-          <MusicPlayer songs={songs} />
+          <MusicPlayer songs={songs} authed={authed} />
         </ThemeProvider>
       </body>
     </html>

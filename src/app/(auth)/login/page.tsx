@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Heart, AlertCircle, ShieldAlert } from "lucide-react";
 import { login } from "./actions";
+import { markAdminSession } from "@/lib/admin-session";
 
 function LoginForm() {
   const [state, formAction, pending] = useActionState(login, { error: "", success: false });
@@ -16,7 +17,7 @@ function LoginForm() {
 
   useEffect(() => {
     if (state.success) {
-      sessionStorage.setItem("admin_session", "true");
+      markAdminSession();
       router.push("/");
     }
   }, [state.success, router]);

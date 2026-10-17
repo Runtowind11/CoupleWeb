@@ -13,9 +13,14 @@ export async function createClient() {
           return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+          } catch {
+            // 在 Server Component 渲染期间无法写 cookie，可安全忽略：
+            // 会话刷新由 middleware 负责写回
+          }
         },
       },
     },
