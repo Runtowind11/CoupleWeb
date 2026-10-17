@@ -1,24 +1,42 @@
 // “本次会话是通过登录页登录的”标记。
 //
-// 为什么用会话级 cookie 而不是 sessionStorage：
-// sessionStorage 是「按标签页」的，手机浏览器回收/恢复标签页时会连标记一起清掉，
-// 于是 SessionValidator 会把合法登录误判成异常会话并登出（图标消失、点管理被弹回登录页）。
-// 会话级 cookie 在刷新、切后台、标签页被回收后都还在，只有浏览器整体退出才失效——
-// 即「关掉浏览器才需要重新登录」。
+// 存放位置：sessionStorage（按标签页存活），以此兑现设计规则——
+// 关闭标签页 / 关闭浏览器后再进入网站，必须重新登录。
+//
+// 不要改回会话级 cookie：手机浏览器关闭标签页并不会结束“浏览器会话”，
+// 杀掉浏览器后台后往往还会恢复 cookie，导致标记仍在、不再要求登录，
+// 与设计规则不符（2026-10-18 曾短暂如此，已改回）。
 const NAME = "admin_session";
 
 export function hasAdminSession(): boolean {
-  if (typeof document === "undefined") return false;
-  return document.cookie
-    .split("; ")
-    .some((c) => c.startsWith(`${NAME}=`) && c.length > NAME.length + 1);
+  if (typeof window === "undefined") return false;
+  try {
+    return Boolean(sessionStorage.getItem(NAME));
+  } catch {
+    return false;
+  }
 }
 
 export function markAdminSession() {
-  // 不写 max-age / expires → 会话级 cookie
-  document.cookie = `${NAME}=1; path=/; samesite=lax`;
+  try {
+    sessionStorage.setItem(NAME, "1");
+  } catch {
+    /* ignore */
+  }
+  // 顺带清掉曾短暂用过的同名会话级 cookie，避免旧标记滞留
+  clearLegacyCookie();
 }
 
 export function clearAdminSession() {
+  try {
+    sessionStorage.removeItem(NAME);
+  } catch {
+    /* ignore */
+  }
+  clearLegacyCookie();
+}
+
+function clearLegacyCookie() {
+  if (typeof document === "undefined") return;
   document.cookie = `${NAME}=; path=/; max-age=0`;
 }
