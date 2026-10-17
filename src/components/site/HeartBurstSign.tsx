@@ -8,9 +8,9 @@ import LoveCounter from "./LoveCounter";
 // 只使用 Emoji 1.0 字符，避免旧 Android / iOS 出现方框
 const EMOJIS = ["❤️", "💖", "💗", "💕", "💓"];
 
-// 单次点击生成的爱心数量、同屏上限（防止连点堆积）
-const BURST_SIZE = 14;
-const MAX_PARTICLES = 120;
+// 单次点击生成的爱心数量、同屏上限（防止连点堆积 / 移动端合成层过多）
+const BURST_SIZE = 12;
+const MAX_PARTICLES = 72;
 
 // 出生点圆盘半径、方向扇形半角（度）、行程占视口高度的比例区间
 const SPAWN_RADIUS = 110;
@@ -102,7 +102,7 @@ export default function HeartBurstSign({
           sway: reduced ? 0 : random(-30, 30),
           rotation: reduced ? 0 : random(-90, 90),
           duration: reduced ? 1.1 : random(2.8, 4.8),
-          delay: reduced ? 0 : random(0, 0.7),
+          delay: reduced ? 0 : random(0, 0.6),
           fade: reduced,
         };
       },
@@ -182,7 +182,7 @@ export default function HeartBurstSign({
         createPortal(
           <div
             aria-hidden
-            className="pointer-events-none fixed inset-0 z-[60] overflow-hidden"
+            className="pointer-events-none fixed inset-0 z-40 overflow-hidden"
           >
             {particles.map((p) => (
               <span
@@ -195,10 +195,9 @@ export default function HeartBurstSign({
                   style={
                     {
                       fontSize: p.size,
-                      willChange: "transform, opacity",
                       animation: `${
                         p.fade ? "heart-burst-fade" : "heart-burst"
-                      } ${p.duration}s ease-in-out ${p.delay}s forwards`,
+                      } ${p.duration}s ease-in-out ${p.delay}s both`,
                       "--burst-drift": `${p.drift}px`,
                       "--burst-rise": `${p.rise}px`,
                       "--burst-sway": `${p.sway}px`,

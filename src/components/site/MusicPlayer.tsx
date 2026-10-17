@@ -423,7 +423,7 @@ export default function MusicPlayer({ songs }: MusicPlayerProps) {
             onClick={handleClick}
             aria-label="打开音乐播放器"
             title="打开音乐播放器"
-            className="liquid-glass flex h-12 w-12 cursor-grab touch-none items-center justify-center rounded-full text-rose-500 transition-transform active:cursor-grabbing hover:scale-105"
+            className="glass-solid flex h-12 w-12 cursor-grab touch-none items-center justify-center rounded-full text-rose-500 transition-transform active:cursor-grabbing hover:scale-105"
           >
             {playing ? (
               <span className="flex h-4 items-end gap-[3px]">
