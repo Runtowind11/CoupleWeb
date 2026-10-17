@@ -68,19 +68,20 @@ export default function MusicPlayer({ songs, authed }: MusicPlayerProps) {
   const autoAttemptedRef = useRef(false);
   const restoredRef = useRef(false);
   const playingRef = useRef(false);
-  const pendingResumeRef = useRef(false);
+  // 是否"想播放"：有自动播放意图或用户按过播放 → true；用户手动暂停 → false。
+  // "点击任意处继续播放"只看这个意图，不再依赖上一次 play() 是否被拒绝（移动端并不可靠）
+  const wantsPlayRef = useRef(false);
 
   const attemptPlay = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    wantsPlayRef.current = true;
     audio
       .play()
       .then(() => {
-        pendingResumeRef.current = false;
         setPlaying(true);
       })
       .catch(() => {
-        pendingResumeRef.current = true;
         setPlaying(false);
       });
   }, []);
@@ -189,6 +190,9 @@ export default function MusicPlayer({ songs, authed }: MusicPlayerProps) {
     audio.src = audioSrc;
     if (pendingPlayRef.current) {
       pendingPlayRef.current = false;
+      // 即使此刻页面在后台、这次没能尝试播放，也先记下播放意图，
+      // 用户回来后的第一次点击就能把音乐接上
+      wantsPlayRef.current = true;
       audio.currentTime = 0;
       if (!document.hidden) {
         attemptPlay();
@@ -197,16 +201,21 @@ export default function MusicPlayer({ songs, authed }: MusicPlayerProps) {
   }, [currentId, audioSrc, resyncTick, authed, attemptPlay]);
 
   useEffect(() => {
-    const onTap = (e: PointerEvent) => {
-      if (!pendingResumeRef.current) return;
+    const onTap = (e: Event) => {
+      if (!wantsPlayRef.current) return;
       if (document.hidden) return;
       if ((e.target as Element | null)?.closest("[data-player-root]")) return;
       const audio = audioRef.current;
       if (!audio || !audio.paused) return;
       attemptPlay();
     };
+    // pointerdown 覆盖桌面；click 作为移动端的兜底触发
     document.addEventListener("pointerdown", onTap);
-    return () => document.removeEventListener("pointerdown", onTap);
+    document.addEventListener("click", onTap);
+    return () => {
+      document.removeEventListener("pointerdown", onTap);
+      document.removeEventListener("click", onTap);
+    };
   }, [attemptPlay]);
 
   useEffect(() => {
@@ -279,6 +288,8 @@ export default function MusicPlayer({ songs, authed }: MusicPlayerProps) {
     if (!audio) return;
 
     if (playing) {
+      // 用户手动暂停：清掉播放意图，之后点击页面不会自动恢复
+      wantsPlayRef.current = false;
       audio.pause();
       setPlaying(false);
     } else {
