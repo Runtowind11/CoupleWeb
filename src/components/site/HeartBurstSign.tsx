@@ -9,8 +9,14 @@ import LoveCounter from "./LoveCounter";
 const EMOJIS = ["❤️", "💖", "💗", "💕", "💓"];
 
 // 单次点击生成的爱心数量、同屏上限（防止连点堆积）
-const BURST_SIZE = 16;
+const BURST_SIZE = 14;
 const MAX_PARTICLES = 120;
+
+// 出生点圆盘半径、方向扇形半角（度）、行程占视口高度的比例区间
+const SPAWN_RADIUS = 110;
+const FAN_ANGLE = 65;
+const TRAVEL_MIN_RATIO = 0.3;
+const TRAVEL_MAX_RATIO = 0.62;
 
 // 超过这个位移或时长就判定为滑动 / 长按，不触发特效
 const TAP_MOVE_TOLERANCE = 10;
@@ -24,6 +30,7 @@ interface Particle {
   emoji: string;
   drift: number;
   rise: number;
+  sway: number;
   rotation: number;
   duration: number;
   delay: number;
@@ -66,22 +73,36 @@ export default function HeartBurstSign({
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const width = window.innerWidth;
     const height = window.innerHeight;
+    // 横向行程上限：避免爱心过早飘出屏幕左右边缘
+    const maxDrift = width * 0.45;
 
     const batch: Particle[] = Array.from(
       { length: reduced ? 4 : BURST_SIZE },
       () => {
-        const size = reduced ? random(16, 26) : random(18, 38);
+        // 出生点：以点击点为圆心的圆盘内随机，避免一簇挤在一起
+        const spawnAngle = random(0, Math.PI * 2);
+        const spawnRadius = reduced ? 0 : random(0, SPAWN_RADIUS);
+        // 方向：以“竖直向上”为中心的扇形，配合随机行程向外散开
+        const fan = random(-FAN_ANGLE, FAN_ANGLE) * (Math.PI / 180);
+        const travel = reduced
+          ? 0
+          : random(height * TRAVEL_MIN_RATIO, height * TRAVEL_MAX_RATIO);
+        const drift = Math.max(
+          -maxDrift,
+          Math.min(maxDrift, Math.sin(fan) * travel),
+        );
         return {
           id: (idRef.current += 1),
-          left: x + random(-36, 36),
-          top: y + random(-18, 18),
-          size,
+          left: x + Math.cos(spawnAngle) * spawnRadius,
+          top: y + Math.sin(spawnAngle) * spawnRadius,
+          size: reduced ? random(16, 26) : random(16, 40),
           emoji: randomOf(EMOJIS),
-          drift: reduced ? 0 : random(-width * 0.12, width * 0.12),
-          rise: reduced ? 0 : -random(height * 0.55, height * 0.85),
-          rotation: reduced ? 0 : random(-40, 40),
-          duration: reduced ? 1.1 : random(1.1, 2),
-          delay: reduced ? 0 : random(0, 0.25),
+          drift,
+          rise: -Math.cos(fan) * travel,
+          sway: reduced ? 0 : random(-30, 30),
+          rotation: reduced ? 0 : random(-90, 90),
+          duration: reduced ? 1.1 : random(2.8, 4.8),
+          delay: reduced ? 0 : random(0, 0.7),
           fade: reduced,
         };
       },
@@ -94,11 +115,12 @@ export default function HeartBurstSign({
         : next;
     });
 
-    // 兜底回收：即使动画事件没触发，粒子也不会一直留在 DOM 里
+    // 兜底回收：按该批实际最长存活时间计算，避免慢速粒子被提前删掉
     const ids = new Set(batch.map((p) => p.id));
+    const longest = Math.max(...batch.map((p) => p.delay + p.duration));
     window.setTimeout(
       () => setParticles((list) => list.filter((p) => !ids.has(p.id))),
-      2600,
+      (longest + 0.4) * 1000,
     );
 
     setBeating(true);
@@ -176,9 +198,10 @@ export default function HeartBurstSign({
                       willChange: "transform, opacity",
                       animation: `${
                         p.fade ? "heart-burst-fade" : "heart-burst"
-                      } ${p.duration}s ease-out ${p.delay}s forwards`,
+                      } ${p.duration}s ease-in-out ${p.delay}s forwards`,
                       "--burst-drift": `${p.drift}px`,
                       "--burst-rise": `${p.rise}px`,
+                      "--burst-sway": `${p.sway}px`,
                       "--burst-rot": `${p.rotation}deg`,
                     } as React.CSSProperties
                   }
