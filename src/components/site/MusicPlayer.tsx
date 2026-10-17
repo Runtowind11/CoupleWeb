@@ -246,9 +246,13 @@ export default function MusicPlayer({ songs, authed }: MusicPlayerProps) {
   }, [mode, songs, currentId, attemptPlay]);
 
   useEffect(() => {
-    if (pos || pathname !== "/") return;
-
     const timer = setTimeout(() => {
+      // 非首页：清掉吸附/拖动位置，回到默认位置（距右、下各 24px）
+      if (pathname !== "/") {
+        setPos(null);
+        return;
+      }
+      // 首页：吸附到页头 Logo 下方
       const logo = document.querySelector<HTMLElement>("#site-logo");
       if (!logo) return;
       const rect = logo.getBoundingClientRect();
@@ -256,7 +260,7 @@ export default function MusicPlayer({ songs, authed }: MusicPlayerProps) {
       setPos({ x: Math.max(rect.left, 8), y: rect.bottom + 12 });
     }, 0);
     return () => clearTimeout(timer);
-  }, [pathname, pos]);
+  }, [pathname]);
 
   useLayoutEffect(() => {
     if (!open) return;
